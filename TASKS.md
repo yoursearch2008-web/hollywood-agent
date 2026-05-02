@@ -17,16 +17,20 @@
 - [ ] Set up auto-deployment to Vercel/Netlify/Cloudflare Pages
 - [ ] Configure auto-update for dependencies and security patches
 
-## In Progress
+## Completed
 - [x] Add ad injection to Website Builder (OpenPage) - DONE
 - [x] Add user accounts (JWT mock) to Website Builder - DONE
 - [x] Integrate real JWT backend (Supabase) for both builders - DONE
 - [x] Add ad injection instructions to App Builder (MakeX) - DONE
 - [x] Add multilingual instructions to App Builder - DONE
 - [x] Add multilingual support to Website Builder (i18n) - DONE
-- [ ] Add multilingual support to App Builder (implement i18n in generated apps)
+- [x] Add multilingual support to App Builder (i18n config + prompt instructions) - DONE
+
+## In Progress
 - [ ] Set up automated deployment pipelines (Vercel/Netlify)
 - [ ] Configure daily self-improvement PDCA loops for Hollywood agent
+- [ ] Add language switcher component to both builders
+- [ ] Test all multilingual functionality
 
 ## Completed
 - [x] Initial research on pricing, monetization, self-improvement architectures, open-source stacks
