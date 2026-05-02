@@ -37,12 +37,13 @@
 - [x] Add language switcher to Website Builder - DONE
 - [x] Add language switcher to App Builder - DONE
 - [x] Test all multilingual functionality - DONE
+- [x] Set up automated deployment pipelines (Vercel/Netlify) - DONE
 
 ## In Progress
-- [ ] Set up automated deployment pipelines (Vercel/Netlify)
 - [ ] Configure daily self-improvement PDCA loops for Hollywood agent
 - [ ] Add LanguageSwitcher to MakeX UI layout
 - [ ] Verify deployment workflows for both builders
+- [ ] Create research script for daily self-improvement
 
 ## Completed
 - [x] Initial research on pricing, monetization, self-improvement architectures, open-source stacks
