@@ -19,8 +19,9 @@
 
 ## In Progress
 - [x] Add ad injection to Website Builder (OpenPage) - DONE
-- [ ] Add user accounts (JWT) to Website Builder
+- [x] Add user accounts (JWT mock) to Website Builder - DONE
 - [ ] Add multilingual support to Website Builder
+- [ ] Integrate real JWT backend (Supabase) for Website Builder
 - [ ] Customize App Builder (MakeX) with ad injection, user accounts, multilingual support
 
 ## Completed
