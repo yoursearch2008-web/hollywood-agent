@@ -35,12 +35,13 @@
 - [x] Add multilingual support to Website Builder (i18n) - DONE
 - [x] Add multilingual support to App Builder (i18n config + prompt instructions) - DONE
 - [x] Add language switcher to Website Builder - DONE
+- [x] Add language switcher to App Builder - DONE
 
 ## In Progress
 - [ ] Set up automated deployment pipelines (Vercel/Netlify)
 - [ ] Configure daily self-improvement PDCA loops for Hollywood agent
-- [ ] Add language switcher to App Builder
 - [ ] Test all multilingual functionality
+- [ ] Add LanguageSwitcher to MakeX UI layout
 
 ## Completed
 - [x] Initial research on pricing, monetization, self-improvement architectures, open-source stacks
