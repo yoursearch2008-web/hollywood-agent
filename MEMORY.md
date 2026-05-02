@@ -15,6 +15,13 @@ Each memory is a markdown file with a timestamp and descriptive name.
 - $5/mo white-label tier is cheapest in market
 - Use open-source stacks to avoid licensing costs
 - Daily research critical for staying cheapest and secure
+- Replace all proprietary tools with free open-source alternatives:
+  - Exa API → DuckDuckGo HTML scrape (free)
+  - Google AdSense → Revive Adserver (open-source AGPLv3)
+  - Google Fonts → Inter font via cdnjs (free open CDN)
+  - Vercel → Coolify (open-source AGPLv3)
+  - Trigger.dev → Bull.js (open-source MIT)
+  - E2B → Docker containers (open-source Apache 2.0)
 
 ## Improvement History
 - 2026-05-02: Initial setup, created agent spec, researched foundations

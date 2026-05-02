@@ -1,4 +1,4 @@
-name: Daily Self-Improvement Research
+name: Daily Self-Improvement Research (Open Source)
 
 on:
   schedule:
@@ -13,14 +13,15 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
+      - run: npm install jsdom
       - name: Run research tasks
         run: |
-          echo "Running daily research..."
+          echo "Running daily open-source research..."
           node scripts/research.js
           cat memory/*.md >> MEMORY.md
           echo "Research complete."
       - name: Commit research updates
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
-          commit_message: "research: daily self-improvement update"
+          commit_message: "research: daily open-source self-improvement update"
           file_pattern: 'MEMORY.md memory/*.md'

@@ -1,44 +1,49 @@
 const https = require('https');
 const fs = require('fs');
+const { JSDOM } = require('jsdom');
 
-const EXA_API_KEY = process.env.EXA_API_KEY || 'your-exa-api-key';
 const researchTopics = [
-  'website builder pricing 2026',
-  'app builder open source 2026',
-  'AI agent self improvement methods',
-  'programmatic ad revenue optimization',
+  'website builder open source 2026',
+  'app builder free open source 2026',
+  'AI agent self improvement open source',
+  'open source ad server 2026',
   'web builder security best practices 2026'
 ];
 
-function searchExa(query) {
+function searchDuckDuckGo(query) {
   return new Promise((resolve, reject) => {
-    const data = JSON.stringify({ query, type: 'fast', numResults: 3 });
-    const options = {
-      hostname: 'api.exa.ai',
-      path: '/search',
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': EXA_API_KEY
-      }
-    };
-    const req = https.request(options, (res) => {
+    const url = `https://html.duckduckgo.com/html/?q=${encodeURIComponent(query)}`;
+    https.get(url, (res) => {
       let body = '';
       res.on('data', (chunk) => body += chunk);
-      res.on('end', () => resolve(JSON.parse(body)));
-    });
-    req.on('error', reject);
-    req.write(data);
-    req.end();
+      res.on('end', () => {
+        try {
+          const dom = new JSDOM(body);
+          const results = [...dom.window.document.querySelectorAll('.result')].slice(0, 3).map((el, i) => {
+            const titleEl = el.querySelector('.result__title');
+            const linkEl = el.querySelector('.result__url');
+            const snippetEl = el.querySelector('.result__snippet');
+            return {
+              title: titleEl?.textContent || `Result ${i+1}`,
+              url: linkEl?.textContent || '',
+              snippet: snippetEl?.textContent || ''
+            };
+          });
+          resolve({ results });
+        } catch (e) {
+          reject(e);
+        }
+      });
+    }).on('error', reject);
   });
 }
 
 async function runResearch() {
   const date = new Date().toISOString().split('T')[0];
-  let report = `# Research Report ${date}\n\n`;
+  let report = `# Research Report ${open source only) ${date}\n\n`;
   for (const topic of researchTopics) {
     try {
-      const result = await searchExa(topic);
+      const result = await searchDuckDuckGo(topic);
       report += `## ${topic}\n`;
       result.results.forEach((item, i) => {
         report += `${i+1}. [${item.title}](${item.url})\n`;
