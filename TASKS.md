@@ -18,7 +18,17 @@
 - [ ] Configure auto-update for dependencies and security patches
 
 ## In Progress
+- [x] Add ad injection to Website Builder (OpenPage) - DONE
+- [ ] Add user accounts (JWT) to Website Builder
+- [ ] Add multilingual support to Website Builder
+- [ ] Customize App Builder (MakeX) with ad injection, user accounts, multilingual support
+
+## Completed
 - [x] Initial research on pricing, monetization, self-improvement architectures, open-source stacks
+- [x] Created Hollywood agent base (SOUL, MEMORY, TASKS, CLAUDE, skills)
+- [x] Initialized Git repo for Hollywood agent
+- [x] Cloned OpenPage into built-systems/website-builder
+- [x] Cloned MakeX into built-systems/app-builder
 
 ## Completed
 - [x] Created Hollywood agent spec based on 2026 research
