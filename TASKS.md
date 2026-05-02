@@ -26,10 +26,20 @@
 - [x] Add multilingual support to Website Builder (i18n) - DONE
 - [x] Add multilingual support to App Builder (i18n config + prompt instructions) - DONE
 
+## Completed
+- [x] Add ad injection to Website Builder (OpenPage) - DONE
+- [x] Add user accounts (JWT mock) to Website Builder - DONE
+- [x] Integrate real JWT backend (Supabase) for both builders - DONE
+- [x] Add ad injection instructions to App Builder (MakeX) - DONE
+- [x] Add multilingual instructions to App Builder - DONE
+- [x] Add multilingual support to Website Builder (i18n) - DONE
+- [x] Add multilingual support to App Builder (i18n config + prompt instructions) - DONE
+- [x] Add language switcher to Website Builder - DONE
+
 ## In Progress
 - [ ] Set up automated deployment pipelines (Vercel/Netlify)
 - [ ] Configure daily self-improvement PDCA loops for Hollywood agent
-- [ ] Add language switcher component to both builders
+- [ ] Add language switcher to App Builder
 - [ ] Test all multilingual functionality
 
 ## Completed
