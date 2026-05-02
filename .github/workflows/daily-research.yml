@@ -1,0 +1,26 @@
+name: Daily Self-Improvement Research
+
+on:
+  schedule:
+    - cron: '0 0 * * *'  # Runs daily at 00:00 UTC
+  workflow_dispatch:  # Allows manual trigger
+
+jobs:
+  research:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Run research tasks
+        run: |
+          echo "Running daily research..."
+          node scripts/research.js
+          cat memory/*.md >> MEMORY.md
+          echo "Research complete."
+      - name: Commit research updates
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "research: daily self-improvement update"
+          file_pattern: 'MEMORY.md memory/*.md'
