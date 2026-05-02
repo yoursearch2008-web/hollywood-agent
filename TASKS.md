@@ -20,9 +20,12 @@
 ## In Progress
 - [x] Add ad injection to Website Builder (OpenPage) - DONE
 - [x] Add user accounts (JWT mock) to Website Builder - DONE
+- [x] Add ad injection instructions to App Builder (MakeX) - DONE
+- [x] Add multilingual instructions to App Builder - DONE
 - [ ] Add multilingual support to Website Builder
-- [ ] Integrate real JWT backend (Supabase) for Website Builder
-- [ ] Customize App Builder (MakeX) with ad injection, user accounts, multilingual support
+- [ ] Integrate real JWT backend (Supabase) for both builders
+- [ ] Set up automated deployment pipelines (Vercel/Netlify)
+- [ ] Configure daily self-improvement PDCA loops for Hollywood agent
 
 ## Completed
 - [x] Initial research on pricing, monetization, self-improvement architectures, open-source stacks
