@@ -20,10 +20,11 @@
 ## In Progress
 - [x] Add ad injection to Website Builder (OpenPage) - DONE
 - [x] Add user accounts (JWT mock) to Website Builder - DONE
+- [x] Integrate real JWT backend (Supabase) for both builders - DONE
 - [x] Add ad injection instructions to App Builder (MakeX) - DONE
 - [x] Add multilingual instructions to App Builder - DONE
-- [ ] Add multilingual support to Website Builder
-- [ ] Integrate real JWT backend (Supabase) for both builders
+- [ ] Add multilingual support to Website Builder (i18n)
+- [ ] Add multilingual support to App Builder (implement i18n in generated apps)
 - [ ] Set up automated deployment pipelines (Vercel/Netlify)
 - [ ] Configure daily self-improvement PDCA loops for Hollywood agent
 
