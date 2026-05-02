@@ -1,16 +1,31 @@
-# SKILL: 情報収集・リサーチ
+# Research Skill - Web Search & Analysis
 
-## 使用タイミング
-- Webから最新情報を収集するタスク
-- 特定トピックの調査が必要なとき
-- ニュースや技術情報の収集
+## Purpose
+Conduct web searches for new tools, monetization methods, security updates, competitor pricing, and new opportunities.
 
-## 手順
-1. WebFetchツールまたはBashでcurlを使って情報収集
-2. 複数ソースから情報を集める
-3. 重複を除去して要点を整理
-4. RESULTS/<日付>_<トピック>.md に保存
-5. サマリーをDiscordに通知
+## Tools
+- websearch (Exa AI)
+- webfetch (URL content extraction)
 
-## 出力フォーマット
-- タイトル・URL・要点3行以内・重要度（高/中/低）
+## Workflow
+1. Receive research query from orchestrator
+2. Execute websearch with query, type=fast for quick results, deep for comprehensive
+3. Extract key findings into memory/YYYY-MM-DD_research_topic.md
+4. Update MEMORY.md index
+5. Return summary to orchestrator
+
+## Research Topics (Daily)
+- "website builder pricing 2026"
+- "app builder open source stacks 2026"
+- "AI agent self improvement methods"
+- "programmatic ad revenue optimization"
+- "security vulnerabilities web builders 2026"
+- "multilingual support best practices"
+
+## Output Format
+Markdown file with:
+- Title: Research Topic
+- Date: YYYY-MM-DD
+- Key Findings: Bullet points
+- Sources: URLs
+- Action Items: For orchestrator

@@ -1,52 +1,20 @@
-# Agent Memory
+# MEMORY.md - Hollywood Agent Persistent Memory Index
 
-> This file stores learned knowledge, decisions, and retrospective insights.
-> The main agent updates this file after completing tasks.
+This file indexes all persistent memories stored in the `memory/` subdirectory.
+Each memory is a markdown file with a timestamp and descriptive name.
 
----
+## Memory Files
+- 2026-05-02_research_pricing.md - Competitor pricing: Hostinger $1.99/mo, WordPress.com $9/mo, Carrd $9/yr, white-label competitors $10+/mo
+- 2026-05-02_research_monetization.md - Methods: ads, white-label, templates, affiliates, upsells
+- 2026-05-02_research_selfimprovement.md - DGM-H, PDCA cycles, ai-agent-blueprint
+- 2026-05-02_research_stacks.md - OpenPage/Chai (website), MakeX/OpenBuilder (app)
+- 2026-05-02_research_security.md - JWT, E2B sandboxes, SSL/TLS, GDPR
 
-## User Info
+## Lessons Learned
+- End users must be 100% free to be competitive
+- $5/mo white-label tier is cheapest in market
+- Use open-source stacks to avoid licensing costs
+- Daily research critical for staying cheapest and secure
 
-<!-- Fill in as you learn about your operator -->
-- **Name:** [Operator name]
-- **Role:** [Their role / profession]
-- **Preferences:** [Communication style, work hours, priorities]
-- **Tech Stack:** [Languages, frameworks, tools they use]
-
----
-
-## Learned Info
-
-<!-- Facts, patterns, and knowledge acquired during operation -->
-<!-- Format: - YYYY-MM-DD: <what you learned> -->
-
----
-
-## Work History
-
-<!-- Summary of significant completed tasks -->
-<!-- Format: - YYYY-MM-DD: <task summary> | Result: <outcome> -->
-
----
-
-## Decision Log
-
-<!-- Important decisions and their reasoning -->
-<!-- Format: - YYYY-MM-DD: <decision> | Reason: <why> -->
-
----
-
-## Retrospective Log
-
-<!-- PDCA Check/Act results — the most important section -->
-<!-- Format: -->
-<!--
-### YYYY-MM-DD — [Task/Session Name]
-- **What went well:**
-  -
-- **What could be improved:**
-  -
-- **Action taken:**
-  -
-- **Applied to:** [file changed, if any]
--->
+## Improvement History
+- 2026-05-02: Initial setup, created agent spec, researched foundations

@@ -1,17 +1,29 @@
-# SKILL: コーディング・技術作業
+# Coding Skill - Code Generation & Modification
 
-## 使用タイミング
-- コードの調査・分析が必要なとき
-- 技術的な問題解決が必要なとき
-- スクリプトの作成・修正
+## Purpose
+Generate and modify code for website builder, app builder, and self-improvement.
 
-## 手順
-1. タスクの要件を確認
-2. 既存コードがあれば読む
-3. 実装・修正
-4. 動作確認
-5. 結果をMEMORY.mdに記録
+## Tools
+- read (read files)
+- write (create files)
+- edit (modify files)
+- bash (run build/test commands)
 
-## 注意
-- 破壊的な変更は事前にDiscordで確認を取る
-- エラーが出たら3回まで自力でリトライ
+## Workflow
+1. Receive coding task from orchestrator
+2. Read relevant existing code/files
+3. Generate or modify code following project conventions
+4. Run tests/lint if available
+5. Commit changes with standardized message
+6. Report results to orchestrator
+
+## Stacks
+- Website Builder: OpenPage (React 19, TypeScript, Tailwind CSS, Zustand, Vite)
+- App Builder: MakeX (Next.js, React, TypeScript, Tailwind, Supabase)
+- Self: Markdown, Git, PDCA cycles
+
+## Code Style
+- No comments unless requested
+- Follow existing conventions
+- TypeScript strict mode
+- Use Tailwind for styling
