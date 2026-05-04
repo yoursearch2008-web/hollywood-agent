@@ -8,7 +8,8 @@
     "start": "node vercel-server.js"
   },
   "dependencies": {
-    "express": "^4.18.2",
-    "dotenv": "^16.3.1"
+    "@vercel/kv": "^3.0.0",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2"
   }
 }

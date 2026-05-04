@@ -1,4 +1,5 @@
 const express = require('express');
+const storage = require('./lib/storage');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -22,26 +23,21 @@ const HUGGINGFACE_TOKEN = process.env.HUGGINGFACE_TOKEN || '';
 const CLAUDE_CODE_KEY = process.env.CLAUDE_CODE_KEY || '';
 const DISCORD_WEBHOOK_URL = process.env.DISCORD_WEBHOOK_URL || 'https://discord.com/api/webhooks/1500528034703343769/AWO3y3maIgDdPrSw7c3FxrRwF6MJLyFX4Gl1rJ1xi4t3k39YK5YZetkaeYg_8YKig3ct';
 
-const users = new Map();
-const sessions = new Map();
-const files = new Map();
-const projects = new Map();
-
-function setSession(res, userId) {
+async function setSession(res, userId) {
   const sessionToken = Math.random().toString(36).substring(2);
-  sessions.set(sessionToken, userId);
+  await storage.setSessionToken(sessionToken, userId);
   res.setHeader('Set-Cookie', `session=${sessionToken}; Path=/; HttpOnly; SameSite=Lax; Max-Age=2592000`);
   return sessionToken;
 }
 
-function getUser(req) {
+async function getUserFromReq(req) {
   const cookie = req.headers.cookie;
   if (!cookie) return null;
   const match = cookie.match(/session=([^;]+)/);
   if (!match) return null;
-  const userId = sessions.get(match[1]);
+  const userId = await storage.getSessionUserId(match[1]);
   if (!userId) return null;
-  return users.get(userId);
+  return storage.getUser(userId);
 }
 
 async function callAI(prompt, type = 'chat') {
@@ -240,7 +236,7 @@ const PAGES = {
       </div>
       <div class="status-item">
         <span class="status-label">Users</span>
-        <span class="status-value">${users.size} registered</span>
+        <span class="status-value" id="userCount">...</span>
       </div>
     </div>
 
@@ -279,6 +275,12 @@ const PAGES = {
       <p>Hollywood AI Agent © 2026 | <a href="/api/status" style="color:#8b8b9e">API</a></p>
     </footer>
   </div>
+  <script>
+    fetch('/api/status').then(r=>r.json()).then(d=>{
+      const el = document.getElementById('userCount');
+      if (el) el.textContent = (d.users || 0) + ' registered';
+    }).catch(()=>{});
+  </script>
 </body>
 </html>`,
 
@@ -999,16 +1001,20 @@ for (const [path, html] of Object.entries(PAGES)) {
   app.get(path === 'home' ? '/' : `/${path}`, (req, res) => res.send(html));
 }
 
-app.get('/api/status', (req, res) => {
+app.get('/api/status', async (req, res) => {
   const aiProvider = GEMINI_API_KEY ? 'Gemini' : GROQ_API_KEY ? 'Groq' : HUGGINGFACE_TOKEN ? 'HuggingFace' : OPENAI_API_KEY ? 'GPT-4' : 'Demo';
+  const [userCount, fileCount, projectCount] = await Promise.all([
+    storage.userCount(), storage.fileCount(), storage.projectCount()
+  ]);
   res.json({
     status: 'ok',
     timestamp: new Date().toISOString(),
-    users: users.size,
-    files: files.size,
-    projects: projects.size,
+    users: userCount,
+    files: fileCount,
+    projects: projectCount,
     ai: aiProvider,
-    keyLoaded: !!(GEMINI_API_KEY || GROQ_API_KEY || HUGGINGFACE_TOKEN || OPENAI_API_KEY)
+    keyLoaded: !!(GEMINI_API_KEY || GROQ_API_KEY || HUGGINGFACE_TOKEN || OPENAI_API_KEY),
+    storage: storage.isKVEnabled() ? 'Vercel KV' : 'in-memory'
   });
 });
 
@@ -1043,32 +1049,32 @@ app.post('/api/automate', async (req, res) => {
   res.json({ success: true, result: `${actionType} on ${url}${selector ? ' (' + selector + ')' : ''}. Configure Playwright for full automation.` });
 });
 
-app.get('/api/files', (req, res) => {
-  res.json({ files: Array.from(files.entries()).map(([name, content]) => ({ name, content })) });
+app.get('/api/files', async (req, res) => {
+  res.json({ files: await storage.listFiles() });
 });
 
-app.post('/api/files', (req, res) => {
+app.post('/api/files', async (req, res) => {
   const { name, content } = req.body;
   if (!name) return res.status(400).json({ error: 'Missing name' });
-  files.set(name, content || '');
+  await storage.setFile(name, content || '');
   res.json({ success: true, name });
 });
 
-app.delete('/api/files', (req, res) => {
+app.delete('/api/files', async (req, res) => {
   const name = req.query.name;
   if (!name) return res.status(400).json({ error: 'Missing name' });
-  files.delete(name);
+  await storage.deleteFile(name);
   res.json({ success: true });
 });
 
-app.get('/api/projects', (req, res) => {
-  res.json({ projects: Array.from(projects.entries()).map(([name, data]) => ({ name, ...data })) });
+app.get('/api/projects', async (req, res) => {
+  res.json({ projects: await storage.listProjects() });
 });
 
-app.post('/api/projects', (req, res) => {
+app.post('/api/projects', async (req, res) => {
   const { name, description } = req.body;
   if (!name) return res.status(400).json({ error: 'Missing name' });
-  projects.set(name, { description, status: 'planning', created: new Date().toISOString() });
+  await storage.setProject(name, { description, status: 'planning', created: new Date().toISOString() });
   res.json({ success: true, name });
 });
 
@@ -1082,57 +1088,55 @@ app.post('/api/deploy', async (req, res) => {
   });
 });
 
-app.get('/api/auth', (req, res) => {
+app.get('/api/auth', async (req, res) => {
   const path = req.query.path || '';
   if (path === 'google-login') {
-    const redirectUri = DOMAIN ? `https://${DOMAIN}/api/auth?path=callback/google` : `http://localhost:${PORT}/api/auth?path=callback/google`;
+    const redirectUri = `https://${DOMAIN}/api/auth?path=callback/google`;
     const url = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${GOOGLE_CLIENT_ID}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code&scope=email%20profile&access_type=offline`;
     return res.redirect(url);
   }
   if (path === 'callback/google') {
     const code = req.query.code || '';
     if (!code) return res.redirect('/?error=no-code');
-    (async () => {
-      try {
-        const redirectUri = DOMAIN ? `https://${DOMAIN}/api/auth?path=callback/google` : `http://localhost:${PORT}/api/auth?path=callback/google`;
-        const tokenRes = await fetch('https://oauth2.googleapis.com/token', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-          body: new URLSearchParams({ code, client_id: GOOGLE_CLIENT_ID, client_secret: GOOGLE_CLIENT_SECRET, redirect_uri: redirectUri, grant_type: 'authorization_code' }),
-        });
-        const tokenData = await tokenRes.json();
-        const userRes = await fetch('https://www.googleapis.com/oauth2/v2/userinfo', { headers: { Authorization: `Bearer ${tokenData.access_token}` } });
-        const userData = await userRes.json();
-        const userId = userData.id;
-        users.set(userId, { email: userData.email, name: userData.name, plan: 'starter', paid: false });
-        setSession(res, userId);
-        return res.redirect('/?welcome=' + encodeURIComponent(userData.name));
-      } catch (e) { return res.redirect('/?error=auth-failed'); }
-    })();
-    return;
+    try {
+      const redirectUri = `https://${DOMAIN}/api/auth?path=callback/google`;
+      const tokenRes = await fetch('https://oauth2.googleapis.com/token', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams({ code, client_id: GOOGLE_CLIENT_ID, client_secret: GOOGLE_CLIENT_SECRET, redirect_uri: redirectUri, grant_type: 'authorization_code' }),
+      });
+      const tokenData = await tokenRes.json();
+      const userRes = await fetch('https://www.googleapis.com/oauth2/v2/userinfo', { headers: { Authorization: `Bearer ${tokenData.access_token}` } });
+      const userData = await userRes.json();
+      const userId = userData.id;
+      const existing = await storage.getUser(userId);
+      if (!existing) await storage.setUser(userId, { email: userData.email, name: userData.name, plan: 'starter', paid: false });
+      await setSession(res, userId);
+      return res.redirect('/?welcome=' + encodeURIComponent(userData.name));
+    } catch (e) { return res.redirect('/?error=auth-failed'); }
   }
   if (path === 'logout') {
     const cookie = req.headers.cookie;
     const match = cookie && cookie.match(/session=([^;]+)/);
-    if (match) sessions.delete(match[1]);
+    if (match) await storage.deleteSessionToken(match[1]);
     res.setHeader('Set-Cookie', 'session=; Path=/; Max-Age=0');
     return res.redirect('/');
   }
   res.status(404).json({ error: 'Not found' });
 });
 
-app.post('/api/auth', (req, res) => {
+app.post('/api/auth', async (req, res) => {
   const path = req.query.path || '';
   if (path === 'signup') {
     const { email, plan, name } = req.body;
     if (!email) return res.status(400).json({ error: 'Missing email' });
     const userId = 'user_' + Math.random().toString(36).substring(2, 12);
-    users.set(userId, { email, name: name || email.split('@')[0], plan: plan || 'starter', paid: false });
-    setSession(res, userId);
+    await storage.setUser(userId, { email, name: name || email.split('@')[0], plan: plan || 'starter', paid: false });
+    await setSession(res, userId);
     return res.status(200).json({ success: true, userId, name: name || email.split('@')[0], plan: plan || 'starter' });
   }
   if (path === 'check') {
-    const user = getUser(req);
+    const user = await getUserFromReq(req);
     if (!user) return res.status(401).json({ error: 'Not logged in', loggedIn: false });
     return res.status(200).json({ loggedIn: true, ...user });
   }
@@ -1140,7 +1144,7 @@ app.post('/api/auth', (req, res) => {
 });
 
 app.post('/api/stripe/checkout', async (req, res) => {
-  const user = getUser(req);
+  const user = await getUserFromReq(req);
   if (!user) return res.status(401).json({ error: 'Not logged in' });
   
   const { plan } = req.body;
@@ -1186,16 +1190,16 @@ app.post('/api/stripe/checkout', async (req, res) => {
   }
 });
 
-app.post('/api/stripe/webhook', (req, res) => {
+app.post('/api/stripe/webhook', async (req, res) => {
   const event = req.body;
   if (event.type === 'checkout.session.completed') {
     const email = event.data.object?.customer_email;
-    for (const [userId, userData] of users.entries()) {
-      if (userData.email === email) {
-        userData.paid = true;
-        userData.plan = 'pro';
-        users.set(userId, userData);
-        sendDiscord('💰 Payment Received', `User ${email} upgraded to Pro!`);
+    const clientRef = event.data.object?.client_reference_id;
+    if (clientRef) {
+      const userData = await storage.getUser(clientRef);
+      if (userData && userData.email === email) {
+        await storage.setUser(clientRef, { ...userData, paid: true, plan: 'pro' });
+        sendDiscord('Payment Received', `User ${email} upgraded to Pro!`);
       }
     }
   }
