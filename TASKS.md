@@ -35,10 +35,14 @@ https://hollywood-ai-agent.xyz
 - [x] Rate limiting — 100 req/day free tier, paid users unlimited
 
 ### Storage
-- [x] Storage abstraction layer (lib/storage.js) — Vercel KV when available, in-memory fallback
-- [ ] **PERSISTENT STORAGE** — Vercel KV requires Pro plan ($20/mo). Options:
-  - Option A: Upgrade Vercel to Pro → KV auto-activates (no code changes needed)
-  - Option B: Create free Upstash account at upstash.com → add UPSTASH_REDIS_REST_URL + UPSTASH_REDIS_REST_TOKEN to Vercel → update storage.js to use @upstash/redis
+
+- [x] Storage abstraction layer (lib/storage.js) — Upstash Redis (free) → Vercel KV → in-memory fallback
+- [x] @upstash/redis added to package.json
+- [ ] **PERSISTENT STORAGE** — Activate free Upstash Redis:
+  1. Go to upstash.com → create free Redis database
+  2. Copy REST URL + REST Token
+  3. Add to Vercel: UPSTASH_REDIS_REST_URL + UPSTASH_REDIS_REST_TOKEN
+  4. Redeploy — storage will auto-activate (no code changes needed)
 
 ### Open-source replacements
 - [x] DuckDuckGo replaces Exa API
@@ -54,10 +58,13 @@ https://hollywood-ai-agent.xyz
   3. Add Authorized redirect URI: https://hollywood-ai-agent.xyz/api/auth?path=callback/google
 
 ## Next Steps
-- [ ] Persistent storage (Upstash or Vercel Pro KV)
+
+- [x] Daily research cron — /api/jobs/research runs at 08:00 UTC via vercel.json cron
+- [x] Subscription cancellation webhook — downgrades user plan to starter
+- [x] app-builder: TS/ESLint errors skipped in build, railway.json added
+- [ ] **PERSISTENT STORAGE** — Create free Upstash Redis (see Storage section above)
 - [ ] Add Google OAuth redirect URI in Google Cloud Console (manual)
-- [ ] Run daily self-improvement research cycle (cron)
 - [ ] Add Revive AdServer ad injection to main hollywood-agent UI
 - [ ] Deploy website-builder to its own Vercel project
-- [ ] Deploy app-builder to Coolify / Railway
-- [ ] Add webhook for subscription cancellation (downgrade user to starter)
+- [ ] Deploy app-builder to Railway (push to Railway from github.com/yoursearch2008-web/app-builder)
+- [ ] Set JOBS_SECRET env var in Vercel to protect /api/jobs/research from public calls
