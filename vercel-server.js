@@ -12,6 +12,7 @@ app.use(express.raw({ type: '*/*' }));
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID || '';
 const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET || '';
 const STRIPE_SECRET_KEY = process.env.STRIPE_SECRET_KEY || '';
+const STRIPE_WEBHOOK_SECRET = process.env.STRIPE_WEBHOOK_SECRET || '';
 const DOMAIN = process.env.DOMAIN || 'hollywood-ai-agent.xyz';
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY || '';
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY || '';
@@ -1241,7 +1242,30 @@ app.post('/api/stripe/checkout', async (req, res) => {
 });
 
 app.post('/api/stripe/webhook', async (req, res) => {
-  const event = req.body;
+  // Verify Stripe signature to prevent spoofed webhook calls
+  if (STRIPE_WEBHOOK_SECRET) {
+    const sig = req.headers['stripe-signature'];
+    if (!sig) return res.status(400).json({ error: 'Missing stripe-signature header' });
+    try {
+      // Manual HMAC verification (avoids needing the stripe npm package)
+      const crypto = require('crypto');
+      const parts = sig.split(',').reduce((acc, p) => { const [k,v] = p.split('='); acc[k] = v; return acc; }, {});
+      const timestamp = parts.t;
+      const payload = `${timestamp}.${req.body.toString()}`;
+      const expected = crypto.createHmac('sha256', STRIPE_WEBHOOK_SECRET).update(payload).digest('hex');
+      if (expected !== parts.v1) return res.status(400).json({ error: 'Invalid signature' });
+    } catch (e) {
+      return res.status(400).json({ error: 'Signature verification failed' });
+    }
+  }
+
+  let event;
+  try {
+    event = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
+  } catch (e) {
+    return res.status(400).json({ error: 'Invalid JSON' });
+  }
+
   if (event.type === 'checkout.session.completed') {
     const email = event.data.object?.customer_email;
     const clientRef = event.data.object?.client_reference_id;
@@ -1253,6 +1277,12 @@ app.post('/api/stripe/webhook', async (req, res) => {
       }
     }
   }
+
+  if (event.type === 'customer.subscription.deleted') {
+    const customerId = event.data.object?.customer;
+    if (customerId) sendDiscord('Subscription Cancelled', `Customer ${customerId} cancelled.`);
+  }
+
   res.json({ received: true });
 });
 
