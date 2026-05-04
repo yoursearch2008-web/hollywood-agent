@@ -1,13 +1,14 @@
 {
-  "name": "sentinel-agent",
+  "name": "hollywood-ai-agent-web",
   "version": "1.0.0",
-  "main": "sentinel.js",
+  "private": true,
+  "main": "vercel-server.js",
   "scripts": {
-    "start": "node sentinel.js"
+    "dev": "node vercel-server.js",
+    "start": "node vercel-server.js"
   },
   "dependencies": {
-    "marked": "^17.0.5",
-    "neo-blessed": "^0.2.0",
-    "playwright": "^1.58.2"
+    "express": "^4.18.2",
+    "dotenv": "^16.3.1"
   }
 }

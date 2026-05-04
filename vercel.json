@@ -1,0 +1,6 @@
+{
+  "framework": "node",
+  "installCommand": "npm install --omit=dev",
+  "buildCommand": "npm install --omit=dev",
+  "outputDirectory": "."
+}

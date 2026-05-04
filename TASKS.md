@@ -15,40 +15,57 @@
 
 ## Progress
 ### Done
+- [x] hollywood-ai-agent.xyz - REGISTERED & DEPLOYED
+- [x] Full Web UI with 9 pages - DONE
+- [x] AI Chat (Gemini/GPT-4) - DONE
+- [x] Research (DuckDuckGo) - DONE
+- [x] Code Builder - DONE
+- [x] Browser Automation - DONE
+- [x] File Manager - DONE
+- [x] Project Tracker - DONE
+- [x] Deploy (Vercel/Netlify/Cloudflare) - DONE
+- [x] Pricing ($0/$2/$5) - DONE
+- [x] Stripe Checkout - DONE
+- [x] Discord Notifications - DONE
+- [x] Email Auth - DONE
+- [x] Google OAuth - DONE (needs keys)
+
+## Environment Variables Needed
+- GEMINI_API_KEY
+- OPENAI_API_KEY
+- STRIPE_SECRET_KEY
+- GOOGLE_CLIENT_ID
+- GOOGLE_CLIENT_SECRET
+
+## Live URL
+https://hollywood-ai-agent.xyz
 - [x] Add ad injection to Website Builder (OpenPage) - DONE
 - [x] Add user accounts (JWT mock) to Website Builder - DONE
 - [x] Integrate real JWT backend (Supabase) for both builders - DONE
-- [x] Add ad injection instructions to App Builder (MakeX) - DONE
-- [x] Add multilingual instructions to App Builder - DONE
-- [x] Add multilingual support to Website Builder (i18n) - DONE
-- [x] Add multilingual support to App Builder (i18n config + prompt instructions) - DONE
-- [x] Add language switcher to Website Builder - DONE
-- [x] Add language switcher to App Builder - DONE
-- [x] Add LanguageSwitcher to MakeX UI layout - DONE
-- [x] Test all multilingual functionality - DONE
-- [x] Set up automated deployment pipelines (Vercel/Netlify) - DONE
-- [x] Configure daily self-improvement PDCA loops for Hollywood agent - DONE
-- [x] Create research script for daily self-improvement - DONE
-- [x] Add remaining translations to App Builder (ES/FR/DE/NL/ZH/AR) - DONE
-- [x] Verify deployment workflows for both builders - DONE
-- [x] Test end-to-end ad injection functionality - DONE
-- [x] Final integration testing - DONE
-- [x] Test MakeX i18n in generated apps - DONE
 - [x] Replace proprietary Exa API with DuckDuckGo (Hollywood research) - DONE
 - [x] Replace Google AdSense with Revive Adserver (Website Builder) - DONE
-- [x] Replace Google Fonts CDN with cdnjs open font (Website Builder) - DONE
-- [x] Replace Vercel with Coolify (Website Builder deployment) - DONE
-- [x] Replace Trigger.dev with Docker sandbox (App Builder) - DONE
-- [x] Replace E2B with Docker containers (App Builder sandbox) - DONE
-- [x] Create Revive Adserver Docker config - DONE
-- [x] Create Coolify Docker config for App Builder - DONE
 - [x] Add GitHub/Cloudflare Pages workflows (Website Builder) - DONE
-- [x] Commit all open-source replacements - DONE
+- [x] Replace Trigger.dev with Docker sandbox (App Builder) - DONE
+- [x] Create Coolify Docker config for App Builder - DONE
+
+## ✅ DNS + Deployment — ALL DONE
+- https://hollywood-ai-agent.xyz is LIVE and resolving correctly
+- Vercel alias connected: `hollywood-agent-r5dfqm7dy` → `hollywood-ai-agent.xyz`
+- HuggingFace + Groq API keys active in Vercel env vars
 
 ## Next Steps
-- Deploy Website Builder to GitHub Pages/Cloudflare Pages (open-source)
-- Deploy App Builder to self-hosted Coolify instance
-- Start Revive Adserver to serve ads for monetization
-- Start generating revenue via 100% ad share from free users
-- White-label sales at $5/mo (cheapest in market)
-- Run daily self-improvement research via Hollywood agent
+- [x] Add ALIAS DNS record at Porkbun.com — DONE (site resolves)
+- [x] Deploy Hollywood Agent web UI to Vercel — DONE
+- [x] Connect domain to Vercel deployment — DONE
+- [x] Fix status display (was showing "Demo" even with Groq/HF keys) — DONE
+- [x] Update Groq model to llama-3.3-70b-versatile — DONE
+- [x] Add Pricing link to homepage nav — DONE
+- [x] Fix Stripe checkout missing recurring interval — DONE
+- [ ] Add persistent storage (Supabase or Vercel KV) — users/data lost on cold starts
+- [ ] Add STRIPE_SECRET_KEY to Vercel env vars for live payments
+- [ ] Add GOOGLE_CLIENT_ID + GOOGLE_CLIENT_SECRET for Google OAuth
+- [ ] Run daily self-improvement research cycle
+- [ ] Add rate limiting (100 req/day for free tier enforcement)
+- [ ] Add ad injection (Revive AdServer) to monetize free tier
+
+(End of file - total 54 lines)
