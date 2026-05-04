@@ -30,14 +30,20 @@ async function setSession(res, userId) {
   return sessionToken;
 }
 
-async function getUserFromReq(req) {
+async function getSessionData(req) {
   const cookie = req.headers.cookie;
-  if (!cookie) return null;
+  if (!cookie) return { userId: null, user: null };
   const match = cookie.match(/session=([^;]+)/);
-  if (!match) return null;
+  if (!match) return { userId: null, user: null };
   const userId = await storage.getSessionUserId(match[1]);
-  if (!userId) return null;
-  return storage.getUser(userId);
+  if (!userId) return { userId: null, user: null };
+  const user = await storage.getUser(userId);
+  return { userId, user };
+}
+
+async function getUserFromReq(req) {
+  const { user } = await getSessionData(req);
+  return user;
 }
 
 async function callAI(prompt, type = 'chat') {
@@ -1144,21 +1150,20 @@ app.post('/api/auth', async (req, res) => {
 });
 
 app.post('/api/stripe/checkout', async (req, res) => {
-  const user = await getUserFromReq(req);
+  const { userId, user } = await getSessionData(req);
   if (!user) return res.status(401).json({ error: 'Not logged in' });
-  
+
   const { plan } = req.body;
   if (!STRIPE_SECRET_KEY) return res.status(500).json({ error: 'Stripe not configured' });
-  
-  const prices = { starter: 0, pro: 500, enterprise: 1500 };
-  const amount = prices[plan] || 0;
-  
+
+  const prices = { starter: 0, pro: 200, enterprise: 500 };
+  const amount = prices[plan] ?? 0;
+
   if (amount === 0) {
-    user.plan = 'starter';
-    user.paid = true;
+    await storage.setUser(userId, { ...user, plan: 'starter', paid: true });
     return res.json({ success: true, plan: 'starter' });
   }
-  
+
   try {
     const customerRes = await fetch('https://api.stripe.com/v1/checkout/sessions', {
       method: 'POST',
@@ -1168,6 +1173,7 @@ app.post('/api/stripe/checkout', async (req, res) => {
       },
       body: new URLSearchParams({
         'mode': 'subscription',
+        'client_reference_id': userId,
         'customer_email': user.email,
         'line_items[0][price_data][currency]': 'usd',
         'line_items[0][price_data][unit_amount]': String(amount),
