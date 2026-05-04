@@ -2,5 +2,11 @@
   "framework": "node",
   "installCommand": "npm install --omit=dev",
   "buildCommand": "npm install --omit=dev",
-  "outputDirectory": "."
+  "outputDirectory": ".",
+  "crons": [
+    {
+      "path": "/api/jobs/research",
+      "schedule": "0 8 * * *"
+    }
+  ]
 }

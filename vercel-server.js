@@ -1269,21 +1269,54 @@ app.post('/api/stripe/webhook', async (req, res) => {
   if (event.type === 'checkout.session.completed') {
     const email = event.data.object?.customer_email;
     const clientRef = event.data.object?.client_reference_id;
+    const stripeCustomerId = event.data.object?.customer;
     if (clientRef) {
       const userData = await storage.getUser(clientRef);
       if (userData && userData.email === email) {
-        await storage.setUser(clientRef, { ...userData, paid: true, plan: 'pro' });
+        await storage.setUser(clientRef, { ...userData, paid: true, plan: 'pro', stripeCustomerId });
+        if (stripeCustomerId) await storage.setStripeCustomer(stripeCustomerId, clientRef);
         sendDiscord('Payment Received', `User ${email} upgraded to Pro!`);
       }
     }
   }
 
   if (event.type === 'customer.subscription.deleted') {
-    const customerId = event.data.object?.customer;
-    if (customerId) sendDiscord('Subscription Cancelled', `Customer ${customerId} cancelled.`);
+    const stripeCustomerId = event.data.object?.customer;
+    if (stripeCustomerId) {
+      const userId = await storage.getUserIdByStripeCustomer(stripeCustomerId);
+      if (userId) {
+        const userData = await storage.getUser(userId);
+        if (userData) {
+          await storage.setUser(userId, { ...userData, paid: false, plan: 'starter', stripeCustomerId: null });
+          sendDiscord('Subscription Cancelled', `User ${userData.email} downgraded to Starter.`);
+        }
+      } else {
+        sendDiscord('Subscription Cancelled', `Customer ${stripeCustomerId} cancelled (user not found).`);
+      }
+    }
   }
 
   res.json({ received: true });
+});
+
+// ─── Research Cron Job ────────────────────────────────────────────────────────
+app.post('/api/jobs/research', async (req, res) => {
+  const secret = process.env.JOBS_SECRET || '';
+  const key = req.query.key || req.headers['x-jobs-secret'] || '';
+  if (secret && key !== secret) return res.status(401).json({ error: 'Unauthorized' });
+
+  try {
+    const { runResearch } = require('./jobs/research');
+    const result = await runResearch({
+      groqKey: GROQ_API_KEY,
+      hfToken: HUGGINGFACE_TOKEN,
+      discordWebhook: DISCORD_WEBHOOK_URL,
+      memoryPath: null, // read-only filesystem on Vercel
+    });
+    res.json({ ok: true, ...result });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
 });
 
 app.use((req, res) => res.status(404).send('Not Found'));
