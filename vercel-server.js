@@ -277,6 +277,16 @@ const PAGES = {
       </a>
     </div>
 
+    <div class="login-box" id="authBox">
+      <h3 style="margin-bottom:15px;color:#e94560">Get Started Free</h3>
+      <a href="/api/auth?path=google-login" class="btn" style="display:block;text-align:center;margin-bottom:10px;background:#4285f4">Sign in with Google</a>
+      <div style="text-align:center;color:#4a4a5e;margin:10px 0">or</div>
+      <label>Email</label>
+      <input type="email" id="signupEmail" placeholder="you@example.com">
+      <button class="btn" style="width:100%" onclick="signup()">Start Free</button>
+      <p style="color:#4a4a5e;font-size:12px;margin-top:10px;text-align:center">Free tier: 100 AI requests/day · No credit card required</p>
+    </div>
+
     <footer>
       <p>Hollywood AI Agent © 2026 | <a href="/api/status" style="color:#8b8b9e">API</a></p>
     </footer>
@@ -286,6 +296,22 @@ const PAGES = {
       const el = document.getElementById('userCount');
       if (el) el.textContent = (d.users || 0) + ' registered';
     }).catch(()=>{});
+
+    fetch('/api/auth?path=check', {method:'POST'}).then(r=>r.json()).then(d=>{
+      if (d.loggedIn) {
+        const box = document.getElementById('authBox');
+        if (box) box.innerHTML = '<p style="color:#00d26a;font-size:16px;text-align:center;padding:20px">Welcome back, <strong>' + (d.name||d.email) + '</strong>! <a href="/ai" style="color:#e94560">Open AI Chat →</a></p>';
+      }
+    }).catch(()=>{});
+
+    async function signup() {
+      const email = document.getElementById('signupEmail').value.trim();
+      if (!email) return;
+      const r = await fetch('/api/auth?path=signup', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({email})});
+      const d = await r.json();
+      if (d.success) window.location.href = '/ai?welcome=' + encodeURIComponent(d.name);
+    }
+    document.addEventListener('keydown', e => { if (e.key === 'Enter' && document.activeElement.id === 'signupEmail') signup(); });
   </script>
 </body>
 </html>`,
