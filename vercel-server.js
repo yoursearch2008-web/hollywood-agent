@@ -1028,9 +1028,25 @@ app.get('/api/test', (req, res) => {
   res.send('API working! Key: ' + (GEMINI_API_KEY ? 'YES' : 'NO'));
 });
 
+const FREE_DAILY_LIMIT = 100;
+
+async function checkRateLimit(req, res) {
+  const { userId, user } = await getSessionData(req);
+  if (user && user.plan !== 'starter') return true; // paid users: unlimited
+  const ip = req.headers['x-forwarded-for']?.split(',')[0]?.trim() || req.socket?.remoteAddress || 'unknown';
+  const key = userId || `ip:${ip}`;
+  const count = await storage.rateCheck(key, 86400);
+  if (count > FREE_DAILY_LIMIT) {
+    res.status(429).json({ error: `Free tier limit reached (${FREE_DAILY_LIMIT}/day). Upgrade to Pro for unlimited access.`, upgradeUrl: '/pricing' });
+    return false;
+  }
+  return true;
+}
+
 app.post('/api/chat', async (req, res) => {
   const { message } = req.body;
   if (!message) return res.status(400).json({ error: 'Missing message' });
+  if (!await checkRateLimit(req, res)) return;
   const response = await callAI(message);
   res.json({ response });
 });
@@ -1038,6 +1054,7 @@ app.post('/api/chat', async (req, res) => {
 app.post('/api/research', async (req, res) => {
   const { query } = req.body;
   if (!query) return res.status(400).json({ error: 'Missing query' });
+  if (!await checkRateLimit(req, res)) return;
   const results = await research(query);
   res.json({ results });
 });
@@ -1045,6 +1062,7 @@ app.post('/api/research', async (req, res) => {
 app.post('/api/build', async (req, res) => {
   const { prompt } = req.body;
   if (!prompt) return res.status(400).json({ error: 'Missing prompt' });
+  if (!await checkRateLimit(req, res)) return;
   const code = await callAI(prompt + '\n\nGenerate clean, working code. Only output the code, no explanations.');
   res.json({ code });
 });
